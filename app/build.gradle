@@ -4,7 +4,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.0"
     defaultConfig {
-        applicationId "com.ancientlore.jscore"
+        applicationId "com.ancientlore.jscore.example"
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
@@ -21,7 +21,11 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    api project(':jscore')
+
     implementation 'androidx.appcompat:appcompat:1.0.2'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
