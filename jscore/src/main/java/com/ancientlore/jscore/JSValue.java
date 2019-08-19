@@ -553,29 +553,29 @@ public class JSValue {
     protected Object toJavaObject(Class clazz) {
         if (clazz == Object.class)
             return this;
-        else if (clazz == Map.class)
-            return new JSObjectPropertiesMap(toObject(), Object.class);
-        else if (clazz == List.class)
+        else if (clazz == Map.class && isObject())
+            return new JSObjectPropertiesMap(toObject(),Object.class);
+        else if (clazz == List.class && isArray())
             return toJSArray();
-        else if (clazz == String.class)
+        else if (clazz == String.class && isString())
             return toString();
-        else if (clazz == Double.class || clazz == double.class)
+        else if ((clazz == Double.class || clazz == double.class) && isNumber())
             return toNumber();
-        else if (clazz == Float.class || clazz == float.class)
+        else if ((clazz == Float.class || clazz == float.class) && isNumber())
             return toNumber().floatValue();
-        else if (clazz == Integer.class || clazz == int.class)
+        else if ((clazz == Integer.class || clazz == int.class) && isNumber())
             return toNumber().intValue();
-        else if (clazz == Long.class || clazz == long.class)
+        else if ((clazz == Long.class || clazz == long.class) && isNumber())
             return toNumber().longValue();
-        else if (clazz == Byte.class || clazz == byte.class)
+        else if ((clazz == Byte.class || clazz == byte.class) && isNumber())
             return toNumber().byteValue();
-        else if (clazz == Short.class || clazz == short.class)
+        else if ((clazz == Short.class || clazz == short.class) && isNumber())
             return toNumber().shortValue();
-        else if (clazz == Boolean.class || clazz == boolean.class)
+        else if ((clazz == Boolean.class || clazz == boolean.class) && isBoolean())
             return toBoolean();
-        else if (clazz.isArray())
+        else if (clazz.isArray() && isArray())
             return toJSArray().toArray(clazz.getComponentType());
-        else if (JSObject.class.isAssignableFrom(clazz))
+        else if (JSObject.class.isAssignableFrom(clazz) && isObject())
             return clazz.cast(toObject());
         else if (JSValue.class.isAssignableFrom(clazz))
             return clazz.cast(this);
