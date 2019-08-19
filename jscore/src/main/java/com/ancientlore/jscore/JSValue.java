@@ -36,6 +36,7 @@ import android.os.AsyncTask;
 import android.os.Looper;
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -573,6 +574,18 @@ public class JSValue {
             return toNumber().shortValue();
         else if ((clazz == Boolean.class || clazz == boolean.class) && isBoolean())
             return toBoolean();
+        else if (clazz.isArray())
+        {
+            Class itemClass = clazz.getComponentType();
+            if (isArray())
+                return toJSArray().toArray(itemClass);
+            else
+            {
+                Object arr = Array.newInstance(itemClass, 1);
+                Array.set(arr, 0, toJavaObject(itemClass));
+                return arr;
+            }
+        }
         else if (clazz.isArray() && isArray())
             return toJSArray().toArray(clazz.getComponentType());
         else if (JSObject.class.isAssignableFrom(clazz) && isObject())
