@@ -61,7 +61,7 @@ public class JSProxy extends JSObject {
     private void registerMethods() {
         Method[] methods = getClass().getDeclaredMethods();
         for (Method method : methods) {
-            if (method.isAnnotationPresent(jsexport.class)) {
+            if (!method.isBridge() && method.isAnnotationPresent(jsexport.class)) {
                 JSFunction f = new JSFunction(context, method, JSObject.class, this);
                 if (exportTarget == TARGET_THIS)
                     property(method.getName(), f);
