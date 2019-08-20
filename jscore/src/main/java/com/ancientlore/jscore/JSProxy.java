@@ -42,7 +42,7 @@ public class JSProxy extends JSObject {
     }
 
     private void registerFields() {
-        Field[] fields = getClass().getDeclaredFields();
+        Field[] fields = getClass().getFields();
         for (Field field : fields) {
             if (field.isAnnotationPresent(jsexport.class)) {
                 try {
@@ -51,15 +51,15 @@ public class JSProxy extends JSObject {
                         property(field.getName(), field.get(this));
                     else context.property(field.getName(), field.get(this));
                 } catch (IllegalAccessException e) {
-                    Log.e(TAG, "Поле " + field.getName() + " помеченно аннотацией " +
-                            "на экспорт, но имеет закрытый модификатор доступа");
+                    Log.e(TAG, "The field " + field.getName() + " is signed " +
+                            "for export to js, has a private access modificator");
                 }
             }
         }
     }
 
     private void registerMethods() {
-        Method[] methods = getClass().getDeclaredMethods();
+        Method[] methods = getClass().getMethods();
         for (Method method : methods) {
             if (!method.isBridge() && method.isAnnotationPresent(jsexport.class)) {
                 JSFunction f = new JSFunction(context, method, JSObject.class, this);
