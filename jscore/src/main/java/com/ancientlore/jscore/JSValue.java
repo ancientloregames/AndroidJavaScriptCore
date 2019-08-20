@@ -574,6 +574,8 @@ public class JSValue {
             return toNumber().shortValue();
         else if ((clazz == Boolean.class || clazz == boolean.class) && isBoolean())
             return toBoolean();
+        else if (clazz == JSFunction.class && isFunction())
+            return toFunction();
         else if (clazz.isArray())
         {
             Class itemClass = clazz.getComponentType();
