@@ -102,30 +102,30 @@ public class JSValue {
                     valueRef = ((JSValue) val).valueRef();
                     protect(context.ctxRef(), valueRef);
                 } else if (val instanceof Map) {
-                    valueRef = new JSObjectPropertiesMap(context, (Map) val, Object.class).getJSObject().valueRef();
+                    valueRef = new JSObjectPropertiesMap(context, (Map)val, Object.class).getJSObject().valueRef();
                     protect(context.ctxRef(), valueRef);
                 } else if (val instanceof List) {
                     valueRef = new JSArray<>(context, (List) val, JSValue.class).valueRef();
                     protect(context.ctxRef(), valueRef);
                 } else if (val.getClass().isArray()) {
-                    valueRef = new JSArray<>(context, (Object[]) val, JSValue.class).valueRef();
+                    valueRef = new JSArray<>(context, (Object[])val, JSValue.class).valueRef();
                     protect(context.ctxRef(), valueRef);
                 } else if (val instanceof Boolean) {
-                    valueRef = makeBoolean(context.ctxRef(), (Boolean) val);
+                    valueRef = makeBoolean(context.ctxRef(), (Boolean)val);
                 } else if (val instanceof Double) {
-                    valueRef = makeNumber(context.ctxRef(), (Double) val);
+                    valueRef = makeNumber(context.ctxRef(), (Double)val);
                 } else if (val instanceof Float) {
                     valueRef = makeNumber(context.ctxRef(), Double.valueOf(val.toString()));
-                } else if (val instanceof Integer) {
-                    valueRef = makeNumber(context.ctxRef(), ((Integer) val).doubleValue());
+                } else if (val instanceof Integer ) {
+                    valueRef = makeNumber(context.ctxRef(), ((Integer)val).doubleValue());
                 } else if (val instanceof Long) {
-                    valueRef = makeNumber(context.ctxRef(), ((Long) val).doubleValue());
+                    valueRef = makeNumber(context.ctxRef(), ((Long)val).doubleValue());
                 } else if (val instanceof Byte) {
-                    valueRef = makeNumber(context.ctxRef(), ((Byte) val).doubleValue());
+                    valueRef = makeNumber(context.ctxRef(), ((Byte)val).doubleValue());
                 } else if (val instanceof Short) {
-                    valueRef = makeNumber(context.ctxRef(), ((Short) val).doubleValue());
+                    valueRef = makeNumber(context.ctxRef(), ((Short)val).doubleValue());
                 } else if (val instanceof String) {
-                    JSString s = new JSString((String) val);
+                    JSString s = new JSString((String)val);
                     valueRef = makeString(context.ctxRef(), s.stringRef);
                 } else {
                     valueRef = makeUndefined(context.ctxRef());
@@ -586,8 +586,6 @@ public class JSValue {
                 return arr;
             }
         }
-        else if (clazz.isArray() && isArray())
-            return toJSArray().toArray(clazz.getComponentType());
         else if (JSObject.class.isAssignableFrom(clazz) && isObject())
             return clazz.cast(toObject());
         else if (JSValue.class.isAssignableFrom(clazz))
