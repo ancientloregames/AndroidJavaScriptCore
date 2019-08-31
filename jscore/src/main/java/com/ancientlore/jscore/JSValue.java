@@ -93,6 +93,11 @@ public class JSValue {
     @SuppressWarnings("unchecked")
     public JSValue(JSContext ctx, final Object val) {
         context = ctx;
+        setValue(val);
+    }
+
+    protected void setValue(final Object val)
+    {
         context.sync(new Runnable() {
             @Override
             public void run() {
