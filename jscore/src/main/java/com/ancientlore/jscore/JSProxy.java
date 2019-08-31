@@ -6,8 +6,11 @@ import androidx.annotation.IntDef;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 
 public class JSProxy extends JSObject {
     private static final String TAG = JSObject.class.getSimpleName();
@@ -41,10 +44,31 @@ public class JSProxy extends JSObject {
         context.persistObject(this);
     }
 
-    private void registerFields() {
+    /**
+     * Java fields export to JS:
+     * 	1. JSProperty are exporting automatically
+     * 	2. Others - if the @jsexport annotation presents
+     */
+    private void registerFields()
+    {
         Field[] fields = getClass().getFields();
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(jsexport.class)) {
+        for (Field field : fields)
+        {
+            Class type = field.getType();
+            if (type == JSProperty.class) {
+                try {
+                    Constructor<JSProperty> cons = type.getDeclaredConstructor(JSContext.class, Class.class);
+                    field.setAccessible(true);
+                    Class genericClass = (Class) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+                    JSProperty prop = cons.newInstance(context, genericClass);
+                    field.set(this, prop);
+                    property(field.getName(), prop);
+                } catch (InstantiationException e) { e.printStackTrace();
+                } catch (InvocationTargetException e) { e.printStackTrace();
+                } catch (NoSuchMethodException e) { e.printStackTrace();
+                } catch (IllegalAccessException e) { e.printStackTrace(); }
+            }
+            else if (field.isAnnotationPresent(jsexport.class)) {
                 try {
                     field.setAccessible(true);
                     if (exportTarget == TARGET_THIS)
