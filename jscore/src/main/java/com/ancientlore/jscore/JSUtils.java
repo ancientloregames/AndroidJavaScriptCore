@@ -14,6 +14,28 @@ public final class JSUtils {
     private JSUtils() { }
 
     @Nullable
+    @Contract("null, _ -> null")
+    public static Object toJavaObject(JSValue jsValue)
+    {
+        if (isNotConvertable(jsValue))
+            return null;
+        else if (jsValue.isBoolean())
+            return jsValue.toBoolean();
+        else if (jsValue.isNumber())
+            return jsValue.toNumber();
+        else if (jsValue.isString())
+            return jsValue.toString();
+        else if (jsValue.isArray())
+            return toList(jsValue.toJSArray());
+        else if (jsValue.isFunction())
+            return jsValue.toFunction();
+        else if (jsValue.isObject())
+            return toMap(jsValue.toObject());
+        else
+            return null;
+    }
+
+    @Nullable
     public static List<Object> toList(JSBaseArray<JSValue> jsArray) {
 
         if (isConvertable(jsArray)) {
@@ -22,20 +44,9 @@ public final class JSUtils {
 
             for (JSValue jsValue : jsArray) {
 
-                if (isNotConvertable(jsValue))
-                    continue;
-                else if (jsValue.isBoolean())
-                    result.add(jsValue.toBoolean());
-                else if (jsValue.isNumber())
-                    result.add(jsValue.toNumber());
-                else if (jsValue.isString())
-                    result.add(jsValue.toString());
-                else if (jsValue.isArray())
-                    result.add(toList(jsValue.toJSArray()));
-                else if (jsValue.isFunction())
-                    result.add(jsValue.toFunction());
-                else if (jsValue.isObject())
-                    result.add(toMap(jsValue.toObject()));
+                Object object = toJavaObject(jsValue);
+                if (object != null)
+                    result.add(object);
             }
             return result;
         }
@@ -51,22 +62,9 @@ public final class JSUtils {
 
             for (String key : jsObject.propertyNames()) {
 
-                JSValue jsValue = jsObject.property(key);
-
-                if (isNotConvertable(jsValue))
-                    continue;
-                if (jsValue.isBoolean())
-                    result.put(key, jsValue.toBoolean());
-                else if (jsValue.isNumber())
-                    result.put(key, jsValue.toNumber());
-                else if (jsValue.isString())
-                    result.put(key, jsValue.toString());
-                else if (jsValue.isArray())
-                    result.put(key, toList(jsValue.toJSArray()));
-                else if (jsValue.isFunction())
-                    result.put(key, jsValue.toFunction());
-                else if (jsValue.isObject())
-                    result.put(key, toMap(jsValue.toObject()));
+                Object object = toJavaObject(jsObject.property(key));
+                if (object != null)
+                    result.put(key, object);
             }
             return result;
         }
