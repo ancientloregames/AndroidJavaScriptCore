@@ -45,7 +45,7 @@ import java.util.NoSuchElementException;
  * A convenience class for handling JavaScript arrays.  Implements java.util.List interface for
  * simple integration with Java methods.
  */
-public abstract class JSBaseArray<T> extends JSFunction implements List<T> {
+public abstract class JSBaseArray<T> extends JSObject implements List<T> {
 
     protected Class<T> mType;
     protected int mLeftBuffer = 0;
