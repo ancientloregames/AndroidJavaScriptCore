@@ -187,6 +187,10 @@ public class JSValue {
         return runnable.jni.bool;
     }
 
+    public Boolean isDefined() {
+        return !isUndefined();
+    }
+
     /**
      * Tests whether the value is null
      *
@@ -203,6 +207,10 @@ public class JSValue {
         };
         context.sync(runnable);
         return runnable.jni.bool;
+    }
+
+    public Boolean isNotNull() {
+        return !isNull();
     }
 
     /**
