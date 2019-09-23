@@ -54,7 +54,25 @@ public final class JSUtils {
     }
 
     @Nullable
-    public static Map toMap(JSObject jsObject) {
+    public static <T> List<T> toList(JSBaseArray<JSValue> jsArray, Class<T> clazz)
+    {
+        if (isConvertable(jsArray)) {
+
+            List<T> result = new ArrayList<>();
+
+            for (JSValue jsValue : jsArray) {
+
+                Object object = toJavaObject(jsValue);
+                if (object != null && object.getClass().isAssignableFrom(clazz))
+                    result.add((T) object);
+            }
+            return result;
+        }
+        return null;
+    }
+
+    @Nullable
+    public static Map<String, Object> toMap(JSObject jsObject) {
 
         if (isConvertable(jsObject)) {
 
@@ -65,6 +83,24 @@ public final class JSUtils {
                 Object object = toJavaObject(jsObject.property(key));
                 if (object != null)
                     result.put(key, object);
+            }
+            return result;
+        }
+        return null;
+    }
+
+    @Nullable
+    public static <T> Map<String, T> toMap(JSObject jsObject, Class<T> clazz) {
+
+        if (isConvertable(jsObject)) {
+
+            Map<String, T> result = new HashMap<>();
+
+            for (String key : jsObject.propertyNames()) {
+
+                Object object = toJavaObject(jsObject.property(key));
+                if (object != null && object.getClass().isAssignableFrom(clazz))
+                    result.put(key, (T) object);
             }
             return result;
         }
