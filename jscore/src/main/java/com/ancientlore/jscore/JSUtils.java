@@ -5,7 +5,9 @@ import androidx.annotation.Nullable;
 import org.jetbrains.annotations.Contract;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -102,6 +104,83 @@ public final class JSUtils {
                 if (object != null && object.getClass().isAssignableFrom(clazz))
                     result.put(key, (T) object);
             }
+            return result;
+        }
+        return null;
+    }
+
+    @Nullable
+    @Contract("null, _ -> null")
+    public static JSValue toJSValue(JSContext context, Object object)
+    {
+        JSValue result;
+
+        if (object instanceof JSValue)
+            result = (JSValue) object;
+        else if (object instanceof String
+                || object instanceof Boolean
+                || object instanceof Number)
+            result = new JSValue(context, object);
+        else if (object instanceof Map)
+            result = toJSObject(context, (Map) object);
+        else if (object instanceof Collection)
+            result = toJSArray(context, (Collection) object);
+        else if (object != null && object.getClass().isArray())
+            result = toJSArray(context, (Object[]) object);
+        else if (context != null) {
+            if (object == null)
+                result = new JSValue(context, null);
+            else result = new JSValue(context);
+        }
+        else result = null;
+
+        return result;
+    }
+
+    @Nullable
+    @Contract("null, _ -> null; !null, null -> null")
+    public static JSArray<JSValue> toJSArray(JSContext context, Collection collection)
+    {
+        if (context != null && collection != null) {
+            JSArray<JSValue> result = new JSArray(context, JSValue.class);
+
+            Iterator iter = collection.iterator();
+            while (iter.hasNext()) {
+                result.add(toJSValue(context, iter.next()));
+            }
+
+            return result;
+        }
+        return null;
+    }
+
+    @Nullable
+    @Contract("null, _ -> null; !null, null -> null")
+    public static JSArray<JSValue> toJSArray(JSContext context, Object[] array)
+    {
+        if (context != null && array != null) {
+            JSArray<JSValue> result = new JSArray(context, JSValue.class);
+
+            for (Object o : array) {
+                result.add(toJSValue(context, o));
+            }
+
+            return result;
+        }
+        return null;
+    }
+
+    @Nullable
+    @Contract("null, _ -> null; !null, null -> null")
+    public static JSObject toJSObject(JSContext context, Map<String, ?> map)
+    {
+        if (context != null && map != null) {
+            JSObject result = new JSObject(context);
+
+            for (String key : map.keySet()) {
+                result.property(key, toJSValue(context, map.get(key)));
+            }
+
             return result;
         }
         return null;
