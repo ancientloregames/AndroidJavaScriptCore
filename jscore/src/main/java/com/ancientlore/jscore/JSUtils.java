@@ -3,6 +3,9 @@ package com.ancientlore.jscore;
 import androidx.annotation.Nullable;
 
 import org.jetbrains.annotations.Contract;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,7 +19,7 @@ public final class JSUtils {
     private JSUtils() { }
 
     @Nullable
-    @Contract("null, _ -> null")
+    @Contract("null -> null")
     public static Object toJavaObject(JSValue jsValue)
     {
         if (isNotConvertable(jsValue))
@@ -103,6 +106,73 @@ public final class JSUtils {
                 Object object = toJavaObject(jsObject.property(key));
                 if (object != null && object.getClass().isAssignableFrom(clazz))
                     result.put(key, (T) object);
+            }
+            return result;
+        }
+        return null;
+    }
+
+    @Nullable
+    @Contract("null -> null")
+    public static Object toJavaObjectJson(JSValue jsValue)
+    {
+        if (isNotConvertable(jsValue))
+            return null;
+        else if (jsValue.isBoolean())
+            return jsValue.toBoolean();
+        else if (jsValue.isNumber())
+            return jsValue.toNumber();
+        else if (jsValue.isString())
+            return jsValue.toString();
+        else if (jsValue.isArray())
+            return toJsonArray(jsValue.toJSArray());
+        else if (jsValue.isFunction())
+            return jsValue.toFunction();
+        else if (jsValue.isObject())
+            return toJsonObject(jsValue.toObject());
+        else
+            return null;
+    }
+
+    @Nullable
+    @Contract("null -> null")
+    public static JSONObject toJsonObject(JSObject jsObject)
+    {
+        if (isConvertable(jsObject)) {
+
+            JSONObject result = new JSONObject();
+
+            for (String key : jsObject.propertyNames()) {
+
+                Object object = toJavaObjectJson(jsObject.property(key));
+
+                if (object != null)
+                {
+                    try {
+                        result.put(key, object);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
+    }
+
+    @Nullable
+    @Contract("null -> null")
+    public static JSONArray toJsonArray(JSBaseArray<JSValue> jsArray)
+    {
+        if (isConvertable(jsArray)) {
+
+            JSONArray result = new JSONArray();
+
+            for (JSValue jsValue : jsArray) {
+
+                Object object = toJavaObjectJson(jsValue);
+                if (object != null)
+                    result.put(object);
             }
             return result;
         }
