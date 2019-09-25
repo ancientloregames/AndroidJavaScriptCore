@@ -195,6 +195,10 @@ public final class JSUtils {
             result = toJSObject(context, (Map) object);
         else if (object instanceof Collection)
             result = toJSArray(context, (Collection) object);
+        else if (object instanceof JSONObject)
+            result = toJSObject(context, (JSONObject) object);
+        else if (object instanceof JSONArray)
+            result = toJSArray(context, (JSONArray) object);
         else if (object != null && object.getClass().isArray())
             result = toJSArray(context, (Object[]) object);
         else if (context != null) {
@@ -242,6 +246,24 @@ public final class JSUtils {
 
     @Nullable
     @Contract("null, _ -> null; !null, null -> null")
+    public static JSArray<JSValue> toJSArray(JSContext context, JSONArray json)
+    {
+        if (context != null && json != null) {
+
+            JSArray<JSValue> result = new JSArray(context, JSValue.class);
+
+            for (int i = 0; i < json.length(); i++) {
+
+                result.add(toJSValue(context, json.opt(i)));
+            }
+
+            return result;
+        }
+        return null;
+    }
+
+    @Nullable
+    @Contract("null, _ -> null; !null, null -> null")
     public static JSObject toJSObject(JSContext context, Map<String, ?> map)
     {
         if (context != null && map != null) {
@@ -249,6 +271,26 @@ public final class JSUtils {
 
             for (String key : map.keySet()) {
                 result.property(key, toJSValue(context, map.get(key)));
+            }
+
+            return result;
+        }
+        return null;
+    }
+
+    @Nullable
+    @Contract("null, _ -> null; !null, null -> null")
+    public static JSObject toJSObject(JSContext context, JSONObject json)
+    {
+        if (context != null && json != null) {
+
+            JSObject result = new JSObject(context);
+
+            Iterator<String> iter = json.keys();
+            while (iter.hasNext()) {
+
+                String key = iter.next();
+                result.property(key, toJSValue(context, json.opt(key)));
             }
 
             return result;
