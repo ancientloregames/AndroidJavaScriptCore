@@ -2,26 +2,28 @@ package com.ancientlore.jscore;
 
 import androidx.annotation.Nullable;
 
+import org.jetbrains.annotations.NotNull;
 
-public final class JSProperty<T> extends JSValue
+
+public final class JSProperty<T>
 {
+    private final JSObject parent;
+
     private final Class type;
 
-    public JSProperty(JSContext context, Class type)
-    {
-        super(context);
-        this.type = type;
-    }
+    private final String name;
 
-    public JSProperty(JSContext context, T value)
+    public JSProperty(@NotNull JSObject parent, @NotNull String name, @NotNull Class type)
     {
-        super(context, value);
-        type = value.getClass();
+        this.parent = parent;
+        this.name = name;
+        this.type = type;
+        parent.property(name, new JSValue(parent.context));
     }
 
     public void set(T value)
     {
-        setValue(value);
+        parent.property(name, JSUtils.toJSValue(parent.context, value));
     }
 
     /**
@@ -32,34 +34,35 @@ public final class JSProperty<T> extends JSValue
     @Nullable
     public T get()
     {
-        if (isNull() || isUndefined())
-            return null;
+        JSValue jsValue = parent.property(name);
 
-        Object value = null;
-        if (isNumber())
-        {
-            if (type == Integer.class)
-                value = toNumber().intValue();
-            else if (type == Float.class)
-                value = toNumber().floatValue();
-            else if (type == Double.class)
-                value = toNumber();
-            else if (type == Long.class)
-                value = toNumber().longValue();
-            else if (type == Short.class)
-                value = toNumber().shortValue();
+        if (JSUtils.isConvertable(jsValue)) {
+            Object value = null;
+            if (jsValue.isNumber()) {
+                if (type == Integer.class)
+                    value = jsValue.toNumber().intValue();
+                else if (type == Float.class)
+                    value = jsValue.toNumber().floatValue();
+                else if (type == Double.class)
+                    value = jsValue.toNumber();
+                else if (type == Long.class)
+                    value = jsValue.toNumber().longValue();
+                else if (type == Short.class)
+                    value = jsValue.toNumber().shortValue();
+            }
+            else if (type == Boolean.class && jsValue.isBoolean())
+                value = jsValue.toBoolean();
+            else if (type == String.class && jsValue.isString())
+                value = toString();
+            else if (type == JSObject.class && jsValue.isObject())
+                value = jsValue.toObject();
+            else if (type == JSFunction.class && jsValue.isFunction())
+                value = jsValue.toFunction();
+            else if (type == JSArray.class && jsValue.isArray())
+                value = jsValue.toJSArray();
+
+            return (T) value;
         }
-        else if (type == Boolean.class && isBoolean())
-            value = toBoolean();
-        else if (type == String.class && isString())
-            value = toString();
-        else if (type == JSObject.class && isObject())
-            value = toObject();
-        else if (type == JSFunction.class && isFunction())
-            value = toFunction();
-        else if (type == JSArray.class && isArray())
-            value = toJSArray();
-
-        return (T) value;
+        return null;
     }
 }

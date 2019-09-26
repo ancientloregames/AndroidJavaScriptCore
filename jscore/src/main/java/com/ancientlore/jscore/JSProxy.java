@@ -57,12 +57,11 @@ public class JSProxy extends JSObject {
             Class type = field.getType();
             if (type == JSProperty.class) {
                 try {
-                    Constructor<JSProperty> cons = type.getDeclaredConstructor(JSContext.class, Class.class);
+                    Constructor<JSProperty> cons = type.getDeclaredConstructor(JSObject.class, String.class, Class.class);
                     field.setAccessible(true);
                     Class genericClass = (Class) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-                    JSProperty prop = cons.newInstance(context, genericClass);
+                    JSProperty prop = cons.newInstance(this, field.getName(), genericClass);
                     field.set(this, prop);
-                    property(field.getName(), prop);
                 } catch (InstantiationException e) { e.printStackTrace();
                 } catch (InvocationTargetException e) { e.printStackTrace();
                 } catch (NoSuchMethodException e) { e.printStackTrace();
